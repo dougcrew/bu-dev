@@ -5,7 +5,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler{
     private Map<Id, Contact> newContMap;
     private Map<Id, Contact> oldContMap;
 
-    public OpportunityTriggerHandler(){
+    public ContactTriggerHandler(){
         this.newContList = (List<Contact>) Trigger.new;
         this.newContMap = (Map<Id, Contact>) Trigger.newMap;
         this.oldContList = (List<Contact>) Trigger.old;
@@ -13,12 +13,17 @@ public with sharing class ContactTriggerHandler extends TriggerHandler{
     }
 
     public override void afterInsert(){
-        List<Contact> contacts = new List<Contact>();
+        /* System.debug('ContactTriggerHandler.afterInsert called');
+        System.debug('Contact Count: ' + this.newContList.size());*/
+        Map<Id, String> contactZipMap = new Map<Id, String>();
 
         for (Contact cont : this.newContList) {
-            if(cont.Zip_Code__c != null){
-                System.enqueueJob(new GetContactTimeZoneQueueable(cont.Id, cont.Zip_Code__c));
+                if(cont.Zip_Code__c != null){
+                    contactZipMap.put(cont.Id, cont.Zip_Code__c);
+                }                   
             }
+        if(!contactZipMap.isEmpty()) {
+            ZipCodeResponse zipInfo = ZipCodeService.updateContactTimezone(contactId, zipCode);
         }
     }
 }

@@ -12,7 +12,7 @@ public with sharing class ZipCodeResponse {
         public String timezone_abbr { get; set; }
         public String timezone_identifier { get; set; }
         public Integer utc_offset_sec { get; set; }
-        public String is_dst { get; set; }
+        public Boolean is_dst { get; set; }
     }
     
     public class acceptable_city_names {
