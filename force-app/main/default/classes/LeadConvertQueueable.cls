@@ -9,7 +9,7 @@ public class LeadConvertQueueable implements Queueable, Database.AllowsCallouts 
     }
 
     public void execute(QueueableContext context) {
-
+        
         try {
 
             Lead vLeadToConvert = [SELECT Id FROM Lead WHERE Id = :vLeadId AND IsConverted = false LIMIT 1];

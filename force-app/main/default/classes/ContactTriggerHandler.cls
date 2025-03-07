@@ -12,18 +12,18 @@ public with sharing class ContactTriggerHandler extends TriggerHandler{
         this.oldContMap = (Map<Id, Contact>) Trigger.oldMap;
     }
 
-    public override void afterInsert(){
+    public override void afterUpdate(){
         /* System.debug('ContactTriggerHandler.afterInsert called');
         System.debug('Contact Count: ' + this.newContList.size());*/
         Map<Id, String> contactZipMap = new Map<Id, String>();
 
         for (Contact cont : this.newContList) {
-                if(cont.Zip_Code__c != null){
+                if(Trigger.isUpdate && cont.Zip_Code__c != ((Contact)Trigger.oldMap.get(cont.Id)).Zip_Code__c) {
                     contactZipMap.put(cont.Id, cont.Zip_Code__c);
                 }                   
             }
         if(!contactZipMap.isEmpty()) {
-            ZipCodeResponse zipInfo = ZipCodeService.updateContactTimezone(contactId, zipCode);
+            ZipCodeService.updateContactTimezone(contactZipMap);
         }
     }
 }
