@@ -16,6 +16,7 @@ public with sharing class ZipCodeService {
                 System.debug('Deserialization error: ' + e.getMessage());
                 return null;
             }
+            
         }          
         return null;  
     }
@@ -51,17 +52,8 @@ public with sharing class ZipCodeService {
         }
     }
 
-    public static void updateContactTimezone(Map<Id, String> personAccZipMap) {
-        System.debug('updatePersonAccountTimezone called with ' + personAccZipMap.size() + ' person accounts');
-        
-        Map<Id, String> contactZipMap = new Map<Id, String>();
-        for (Contact cont : [SELECT Id, Zip_Code__c
-                            FROM Contact 
-                            WHERE Id IN :personAccZipMap.keySet()]) {
-            if (cont.Id != null) {
-                contactZipMap.put(cont.Id, cont.Zip_Code__c);
-            } System.debug('contactZipMap: ' + contactZipMap);
-        }
+    public static void updateContactTimezone(Map<Id, String> contactZipMap) {
+        List<Contact> contactsToUpdate = new List <Contact>();
         
         for (Id contactId : contactZipMap.keySet()) {
             String zipCode = contactZipMap.get(contactId);
@@ -73,7 +65,12 @@ public with sharing class ZipCodeService {
                     currentContact.Timezone_Identifier__c = zipInfo.timezone.timezone_identifier;
                     currentContact.UTC_Offset_seconds__c = zipInfo.timezone.utc_offset_sec;
                     currentContact.Is_Daylight_Saving__c = Boolean.valueOf(zipInfo.timezone.is_dst);
+
+                    contactsToUpdate.add(currentContact); 
                 }
+            }
+            if (!contactsToUpdate.isEmpty()) {
+                update contactsToUpdate;
             }
     }
 
@@ -83,32 +80,26 @@ public with sharing class ZipCodeService {
     public static void updateContactTimeZoneFromFlow(List<FlowInput> inputs) {
         System.debug('Invocable method called with inputs: ' + inputs.size());
         Map<Id, String> contactZipMap = new Map<Id, String>();
-        Map<Id, String> personAccountMap = new Map<Id, String>();
 
         for (FlowInput input : inputs) {
-            if (input.zipCode != null) {
-                if (input.contactId != null) {
+            if (input.contactId != null) {
+                if (input.zipCode != null) {
                 contactZipMap.put(input.contactId, input.zipCode);
-            } else if (input.accountId != null) {
-                personAccountMap.put(input.accountId, input.zipCode);
                 }
             }
+            if (!contactZipMap.isEmpty()) {
+                updateContactTimeZone(contactZipMap);
+            }
         }
-        if (!contactZipMap.isEmpty()) {
-            updateContactTimeZone(personAccountMap);
-        }
-
     }
 
     public class FlowInput {
         @InvocableVariable(label='Contact ID' required=false)
         public Id contactId;
 
-        @InvocableVariable(label='Account ID (for Person Accounts)' required=false)
-    public Id accountId;
-
         @InvocableVariable(label='Zip Code' required=true)
         public String zipCode;
     }
+    
 }
 

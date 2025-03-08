@@ -13,17 +13,6 @@ public with sharing class ContactTriggerHandler extends TriggerHandler{
     }
 
     public override void afterUpdate(){
-        /* System.debug('ContactTriggerHandler.afterInsert called');
-        System.debug('Contact Count: ' + this.newContList.size());*/
-        Map<Id, String> contactZipMap = new Map<Id, String>();
-
-        for (Contact cont : this.newContList) {
-                if(Trigger.isUpdate && cont.Zip_Code__c != ((Contact)Trigger.oldMap.get(cont.Id)).Zip_Code__c) {
-                    contactZipMap.put(cont.Id, cont.Zip_Code__c);
-                }                   
-            }
-        if(!contactZipMap.isEmpty()) {
-            ZipCodeService.updateContactTimezone(contactZipMap);
-        }
+      String startDateTimeAssigneeTZ = Evt.StartDateTime.format( 'yyyy-MM-dd HH:mm:ss', assignedUser.TimeZoneSidKey );
     }
 }
