@@ -2,9 +2,12 @@ public with sharing class CalculateTimeOffsets {
   public static void updateTimeOffsetFields(List<Contact> contactsToProcess) {
     List<Contact> contactsToUpdate = new List<Contact>();
     System.debug(
-      'Number of contacts received for processing: ' + contactsToProcess.size()
+      'Number of contacts received for processing: ' + contactsToupdate.size()
     );
+
     for (Contact cont : contactsToProcess) {
+      // if (cont.Timezone_Identifier__c = timeOffsets ) {
+
       switch on cont.Timezone_Identifier__c {
         when 'America/New_York' {
           cont.DST_Offset__c = 3;
@@ -34,16 +37,27 @@ public with sharing class CalculateTimeOffsets {
           cont.DST_Offset__c = -2;
           cont.Standard_Time_Offset__c = -3;
         }
+        when else {
+          System.debug(
+            'Unknown timezone identifier: ' + cont.Timezone_Identifier__c
+          );
+        }
       }
 
-      if (cont.Timezone_Identifier__c != null) {
-        cont.Update_Offset_Fields_Now__c = false;
-        contactsToUpdate.add(cont);
-      }
+      contactsToUpdate.add(cont);
     }
 
     if (!contactsToUpdate.isEmpty()) {
-      update contactsToUpdate;
+      try {
+        update contactsToUpdate;
+        System.debug(
+          'Successfully updated ' + contactsToUpdate.size() + ' contacts'
+        );
+      } catch (Exception e) {
+        System.debug('Error updating contacts: ' + e.getMessage());
+      }
+    } else {
+      System.debug('No contacts to update');
     }
   }
 
@@ -56,31 +70,47 @@ public with sharing class CalculateTimeOffsets {
 
   // }
   // This is what I am attempting to use to find out if the scheduled event date is in dst or not
-  public static Date stdTimezoneOffset(Datetime datetime) {
-    Date jan = new Date(Year(DATEVALUE(this.datetime)));
-    Date jul = new Date(Year(DATEVALUE(this.datetime)));
-    return Math.max(jan.getOffset(), jul.getOffset());
+  public static Integer stdTimezoneOffset(Datetime dt) {
+    // Get offset for January (winter) and July (summer) of the same year
+    Integer year = dt.year();
+    Datetime jan = Datetime.newInstance(year, 1, 1);
+    Datetime jul = Datetime.newInstance(year, 7, 1);
+
+    // Return the maximum offset (standard time)
+    return Math.max(getTimezoneOffset(jan), getTimezoneOffset(jul));
   }
 
-  public static Boolean isDstObserved() {
-    return this.getOffset() < this.stdTimezoneOffset();
+  public static Boolean isDstObserved(Datetime dt) {
+    // If current offset is less than standard offset, we're in DST
+    return getTimezoneOffset(dt) < stdTimezoneOffset(dt);
   }
 
-  public static Datetime getTimezonOffset() {
-    // This is a JavaScript function I got from Stack Overflow
-    // Date.prototype.stdTimezoneOffset = function () {
-    //     var jan = new Date(this.getFullYear(), 0, 1);
-    //     var jul = new Date(this.getFullYear(), 6, 1);
-    //     Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
-    // }
+  @InvocableMethod(
+    label='Check If DST Is Observed'
+    description='Determines if Daylight Saving Time is observed for the given datetime'
+  )
+  public static List<Boolean> isDstObservedInvocable(List<Datetime> datetimes) {
+    List<Boolean> results = new List<Boolean>();
+    for (Datetime dt : datetimes) {
+      results.add(isDstObserved(dt));
+    }
+    return results;
+  }
 
-    // Date.prototype.isDstObserved = function () {
-    //     return this.getTimezoneOffset() < this.stdTimezoneOffset();
-    // }
+  private static Integer getTimezoneOffset(Datetime dt) {
+    // Get timezone offset in milliseconds and cast to Integer
+    Long offsetLong =
+      dt.getTime() -
+      DateTime.newInstanceGmt(
+          dt.year(),
+          dt.month(),
+          dt.day(),
+          dt.hour(),
+          dt.minute(),
+          dt.second()
+        )
+        .getTime();
 
-    // var today = new Date();
-    // if (today.isDstObserved()) {
-    //     alert ("Daylight saving time!");
-    // }
+    return Integer.valueOf(offsetLong);
   }
 }

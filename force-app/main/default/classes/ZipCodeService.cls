@@ -67,22 +67,9 @@ public with sharing class ZipCodeService {
         currentContact.Is_Daylight_Saving__c = Boolean.valueOf(
           zipInfo.timezone.is_dst
         );
-        System.debug(
-          'Abbreviation: ' +
-            currentContact.Timezone_Abbr__c +
-            ', ' +
-            'Identifier: ' +
-            currentContact.Timezone_Identifier__c +
-            ', ' +
-            'UTC Offset: ' +
-            currentContact.UTC_Offset_seconds__c +
-            ', ' +
-            'Is Daylight Savings: ' +
-            currentContact.Is_Daylight_Saving__c
-        );
-
         contactsToUpdate.add(currentContact);
       }
+      CalculateTimeOffsets.updateTimeOffsetFields(contactsToUpdate);
     }
     if (!contactsToUpdate.isEmpty()) {
       update contactsToUpdate;
