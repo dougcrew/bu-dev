@@ -1,57 +1,55 @@
 public with sharing class CalculateTimeOffsets {
-  public static void updateTimeOffsetFields(List<Contact> contactsToProcess) {
-    List<Contact> contactsToUpdate = new List<Contact>();
+  public static void updateTimeOffsetFields(List<Account> accountsToProcess) {
+    List<Account> accountsToUpdate = new List<Account>();
     System.debug(
-      'Number of contacts received for processing: ' + contactsToupdate.size()
+      'Number of contacts received for processing: ' + accountsToupdate.size()
     );
 
-    for (Contact cont : contactsToProcess) {
-      // if (cont.Timezone_Identifier__c = timeOffsets ) {
-
-      switch on cont.Timezone_Identifier__c {
+    for (Account acc : AccountsToProcess) {
+      switch on acc.Timezone_Identifier__pc {
         when 'America/New_York' {
-          cont.DST_Offset__c = 3;
-          cont.Standard_Time_Offset__c = 2;
+          acc.DST_Offset__pc = 3;
+          acc.Standard_Time_Offset__pc = 2;
         }
         when 'America/Chicago' {
-          cont.DST_Offset__c = 2;
-          cont.Standard_Time_Offset__c = 1;
+          acc.DST_Offset__pc = 2;
+          acc.Standard_Time_Offset__pc = 1;
         }
         when 'America/Denver' {
-          cont.DST_Offset__c = 1;
-          cont.Standard_Time_Offset__c = 0;
+          acc.DST_Offset__pc = 1;
+          acc.Standard_Time_Offset__pc = 0;
         }
         when 'America/Phoenix' {
-          cont.DST_Offset__c = 0;
-          cont.Standard_Time_Offset__c = 0;
+          acc.DST_Offset__pc = 0;
+          acc.Standard_Time_Offset__pc = 0;
         }
         when 'America/Los_Angeles' {
-          cont.DST_Offset__c = 0;
-          cont.Standard_Time_Offset__c = -1;
+          acc.DST_Offset__pc = 0;
+          acc.Standard_Time_Offset__pc = -1;
         }
         when 'America/Anchorage' {
-          cont.DST_Offset__c = -1;
-          cont.Standard_Time_Offset__c = -2;
+          acc.DST_Offset__pc = -1;
+          acc.Standard_Time_Offset__pc = -2;
         }
         when 'Pacific/Honolulu' {
-          cont.DST_Offset__c = -2;
-          cont.Standard_Time_Offset__c = -3;
+          acc.DST_Offset__pc = -2;
+          acc.Standard_Time_Offset__pc = -3;
         }
         when else {
           System.debug(
-            'Unknown timezone identifier: ' + cont.Timezone_Identifier__c
+            'Unknown timezone identifier: ' + acc.Timezone_Identifier__pc
           );
         }
       }
 
-      contactsToUpdate.add(cont);
+      accountsToUpdate.add(acc);
     }
 
-    if (!contactsToUpdate.isEmpty()) {
+    if (!accountsToUpdate.isEmpty()) {
       try {
-        update contactsToUpdate;
+        update accountsToUpdate;
         System.debug(
-          'Successfully updated ' + contactsToUpdate.size() + ' contacts'
+          'Successfully updated ' + accountsToUpdate.size() + ' accounts'
         );
       } catch (Exception e) {
         System.debug('Error updating contacts: ' + e.getMessage());

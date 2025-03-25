@@ -11,13 +11,13 @@ public with sharing class LeadTriggerHandler extends TriggerHandler {
     this.oldLeadMap = (Map<Id, Lead>) Trigger.oldMap;
   }
 
-  public override void afterInsert() {
-    for (Lead lead : newLeadList) {
-      if (lead != null && lead.isConverted == false) {
-        LeadConversionHelper.convertLead(lead.Id);
-      }
-    }
-  }
+  //   public override void afterInsert() {
+  //     for (Lead lead : newLeadList) {
+  //       if (lead != null && lead.isConverted == false) {
+  //         LeadConversionHelper.convertLead(lead.Id);
+  //       }
+  //     }
+  //   }
 
   public override void afterUpdate() {
     Set<Id> convertedAccountIds = new Set<Id>();
@@ -28,31 +28,22 @@ public with sharing class LeadTriggerHandler extends TriggerHandler {
       }
     }
 
+    if (convertedAccountIds.isEmpty()) {
+      return;
+    }
+
     List<Account> accounts = [
-      SELECT Id, Name
+      SELECT Id, Name, Zip_Code__pc
       FROM Account
       WHERE Id IN :convertedAccountIds
     ];
-    Map<Id, Account> accountMap = new Map<Id, Account>(accounts);
 
-    List<Account> updateAccounts = new List<Account>();
+    List<Account> accountsToUpdate = new List<Account>();
 
-    for (Lead newLead : newLeadList) {
-      Lead oldLead = oldLeadMap.get(newLead.Id);
-      if (!oldLead.IsConverted && newLead.isConverted) {
-        Account account = accountMap.get(newLead.convertedAccountId);
-        updateAccounts.add(account);
+    for (Account acc : accounts) {
+      if (acc.Zip_Code__pc != null) {
+        ZipCodeService.getTimezoneDetail(acc.Zip_Code__pc);
       }
-    }
-    Map<Id, Contact> contactMap = new Map<Id, Contact>();
-    List<Contact> contactsToUpdate = new List<Contact>();
-    for (Account acc : updateAccounts) {
-      Contact contId = acc.PersonContactId;
-
-      contactMap.put(contId);
-    }
-    if (!contactsToUpdate.isEmpty()) {
-      CalculateTimeOffsets.updateTimeOffsetFields(contactsToUpdate);
     }
   }
 }
