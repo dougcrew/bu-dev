@@ -1,55 +1,55 @@
 public with sharing class CalculateTimeOffsets {
-  public static void updateTimeOffsetFields(List<Account> accountsToProcess) {
-    List<Account> accountsToUpdate = new List<Account>();
+  public static void updateTimeOffsetFields(List<Contact> contactsToProcess) {
+    List<Contact> contactsToUpdate = new List<Contact>();
     System.debug(
-      'Number of contacts received for processing: ' + accountsToupdate.size()
+      'Number of contacts received for processing: ' + contactsToUpdate.size()
     );
 
-    for (Account acc : AccountsToProcess) {
-      switch on acc.Timezone_Identifier__pc {
+    for (Contact con : contactsToProcess) {
+      switch on con.Timezone_Identifier__c {
         when 'America/New_York' {
-          acc.DST_Offset__pc = 3;
-          acc.Standard_Time_Offset__pc = 2;
+          con.DST_Offset__c = 3;
+          con.Standard_Time_Offset__c = 2;
         }
         when 'America/Chicago' {
-          acc.DST_Offset__pc = 2;
-          acc.Standard_Time_Offset__pc = 1;
+          con.DST_Offset__c = 2;
+          con.Standard_Time_Offset__c = 1;
         }
         when 'America/Denver' {
-          acc.DST_Offset__pc = 1;
-          acc.Standard_Time_Offset__pc = 0;
+          con.DST_Offset__c = 1;
+          con.Standard_Time_Offset__c = 0;
         }
         when 'America/Phoenix' {
-          acc.DST_Offset__pc = 0;
-          acc.Standard_Time_Offset__pc = 0;
+          con.DST_Offset__c = 0;
+          con.Standard_Time_Offset__c = 0;
         }
         when 'America/Los_Angeles' {
-          acc.DST_Offset__pc = 0;
-          acc.Standard_Time_Offset__pc = -1;
+          con.DST_Offset__c = 0;
+          con.Standard_Time_Offset__c = -1;
         }
         when 'America/Anchorage' {
-          acc.DST_Offset__pc = -1;
-          acc.Standard_Time_Offset__pc = -2;
+          con.DST_Offset__c = -1;
+          con.Standard_Time_Offset__c = -2;
         }
         when 'Pacific/Honolulu' {
-          acc.DST_Offset__pc = -2;
-          acc.Standard_Time_Offset__pc = -3;
+          con.DST_Offset__c = -2;
+          con.Standard_Time_Offset__c = -3;
         }
         when else {
           System.debug(
-            'Unknown timezone identifier: ' + acc.Timezone_Identifier__pc
+            'Unknown timezone identifier: ' + con.Timezone_Identifier__c
           );
         }
       }
 
-      accountsToUpdate.add(acc);
+      contactsToUpdate.add(con);
     }
 
-    if (!accountsToUpdate.isEmpty()) {
+    if (!contactsToUpdate.isEmpty()) {
       try {
-        update accountsToUpdate;
+        update contactsToUpdate;
         System.debug(
-          'Successfully updated ' + accountsToUpdate.size() + ' accounts'
+          'Successfully updated ' + contactsToUpdate.size() + ' contacts'
         );
       } catch (Exception e) {
         System.debug('Error updating contacts: ' + e.getMessage());

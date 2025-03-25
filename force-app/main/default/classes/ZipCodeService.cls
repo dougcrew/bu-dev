@@ -85,14 +85,12 @@ public with sharing class ZipCodeService {
     Map<Id, String> contactZipMap = new Map<Id, String>();
 
     for (FlowInput input : inputs) {
-      if (input.contactId != null) {
-        if (input.zipCode != null) {
-          contactZipMap.put(input.contactId, input.zipCode);
-        }
+      if (input.contactId != null && input.zipCode != null) {
+        contactZipMap.put(input.contactId, input.zipCode);
       }
-      if (!contactZipMap.isEmpty()) {
-        updateContactTimeZone(contactZipMap);
-      }
+    }
+    if (!contactZipMap.isEmpty()) {
+      updateContactTimeZone(contactZipMap);
     }
   }
 

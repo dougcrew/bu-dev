@@ -11,30 +11,30 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
     this.oldConMap = (Map<Id, Contact>) Trigger.oldMap;
   }
 
-  public override void afterInsert() {
-    Set<Id> newContactIds = new Set<Id>();
-    for (Contact con : newConList) {
-      newContactIds.add(con.Id);
-    }
+  // public override void afterInsert() {
+  //   Set<Id> newContactIds = new Set<Id>();
+  //   for (Contact con : newConList) {
+  //     newContactIds.add(con.Id);
+  //   }
 
-    Map<Id, Lead> leadsByContactId = new Map<Id, Lead>();
-    for (Lead ld : [
-      SELECT Id, ConvertedContactId
-      FROM Lead
-      WHERE ConvertedContactId IN :newContactIds
-    ]) {
-      leadsByContactId.put(ld.ConvertedContactId, ld);
-    }
+  //   Map<Id, Lead> leadsByContactId = new Map<Id, Lead>();
+  //   for (Lead ld : [
+  //     SELECT Id, ConvertedContactId
+  //     FROM Lead
+  //     WHERE ConvertedContactId IN :newContactIds
+  //   ]) {
+  //     leadsByContactId.put(ld.ConvertedContactId, ld);
+  //   }
 
-    List<Contact> contactsToProcess = new List<Contact>();
-    for (Contact con : newConList) {
-      if (leadsByContactId.containsKey(con.Id)) {
-        Lead sourceLead = leadsByContactId.get(con.Id);
-        contactsToProcess.add(con);
-      }
-    }
-    if (!contactsToProcess.isEmpty()) {
-      CalculateTimeOffsets.updateTimeOffsetFields(contactsToProcess);
-    }
-  }
+  //   List<Contact> contactsToProcess = new List<Contact>();
+  //   for (Contact con : newConList) {
+  //     if (leadsByContactId.containsKey(con.Id)) {
+  //       Lead sourceLead = leadsByContactId.get(con.Id);
+  //       contactsToProcess.add(con);
+  //     }
+  //   }
+  //   if (!contactsToProcess.isEmpty()) {
+  //     CalculateTimeOffsets.updateTimeOffsetFields(contactsToProcess);
+  //   }
+  // }
 }
