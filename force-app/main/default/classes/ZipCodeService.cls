@@ -51,28 +51,28 @@ public with sharing class ZipCodeService {
       return null;
     }
   }
+  @future(callout=true)
+  public static void updateContactTimezone(Map<Id, String> accountZipMap) {
+    List<Account> accountsToUpdate = new List<Account>();
 
-  public static void updateContactTimezone(Map<Id, String> contactZipMap) {
-    List<Contact> contactsToUpdate = new List<Contact>();
-
-    for (Id contactId : contactZipMap.keySet()) {
-      String zipCode = contactZipMap.get(contactId);
+    for (Id accountId : accountZipMap.keySet()) {
+      String zipCode = accountZipMap.get(accountId);
       ZipCodeResponse zipInfo = getTimezoneDetail(zipCode);
 
       if (zipInfo != null && zipInfo.timezone != null) {
-        Contact currentContact = new Contact(Id = contactId);
-        currentContact.Timezone_Abbr__c = zipInfo.timezone.timezone_abbr;
-        currentContact.Timezone_Identifier__c = zipInfo.timezone.timezone_identifier;
-        currentContact.UTC_Offset_seconds__c = zipInfo.timezone.utc_offset_sec;
-        currentContact.Is_Daylight_Saving__c = Boolean.valueOf(
+        Account currentAccount = new Account(Id = accountId);
+        currentAccount.Timezone_Abbr__pc = zipInfo.timezone.timezone_abbr;
+        currentAccount.Timezone_Identifier__pc = zipInfo.timezone.timezone_identifier;
+        currentAccount.UTC_Offset_seconds__pc = zipInfo.timezone.utc_offset_sec;
+        currentAccount.Is_Daylight_Saving__pc = Boolean.valueOf(
           zipInfo.timezone.is_dst
         );
-        contactsToUpdate.add(currentContact);
+        accountsToUpdate.add(currentAccount);
       }
-      CalculateTimeOffsets.updateTimeOffsetFields(contactsToUpdate);
+      CalculateTimeOffsets.updateTimeOffsetFields(accountsToUpdate);
     }
-    if (!contactsToUpdate.isEmpty()) {
-      update contactsToUpdate;
+    if (!accountsToUpdate.isEmpty()) {
+      update accountsToUpdate;
     }
   }
 

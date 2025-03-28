@@ -1,55 +1,55 @@
 public with sharing class CalculateTimeOffsets {
-  public static void updateTimeOffsetFields(List<Contact> contactsToProcess) {
-    List<Contact> contactsToUpdate = new List<Contact>();
+  public static void updateTimeOffsetFields(List<Account> accountsToProcess) {
+    List<Account> accountsToUpdate = new List<Account>();
     System.debug(
-      'Number of contacts received for processing: ' + contactsToUpdate.size()
+      'Number of contacts received for processing: ' + accountsToProcess.size()
     );
 
-    for (Contact con : contactsToProcess) {
-      switch on con.Timezone_Identifier__c {
+    for (Account acc : accountsToProcess) {
+      switch on acc.Timezone_Identifier__pc {
         when 'America/New_York' {
-          con.DST_Offset__c = 3;
-          con.Standard_Time_Offset__c = 2;
+          acc.DST_Offset__pc = 3;
+          acc.Standard_Time_Offset__pc = 2;
         }
         when 'America/Chicago' {
-          con.DST_Offset__c = 2;
-          con.Standard_Time_Offset__c = 1;
+          acc.DST_Offset__pc = 2;
+          acc.Standard_Time_Offset__pc = 1;
         }
         when 'America/Denver' {
-          con.DST_Offset__c = 1;
-          con.Standard_Time_Offset__c = 0;
+          acc.DST_Offset__pc = 1;
+          acc.Standard_Time_Offset__pc = 0;
         }
         when 'America/Phoenix' {
-          con.DST_Offset__c = 0;
-          con.Standard_Time_Offset__c = 0;
+          acc.DST_Offset__pc = 0;
+          acc.Standard_Time_Offset__pc = 0;
         }
         when 'America/Los_Angeles' {
-          con.DST_Offset__c = 0;
-          con.Standard_Time_Offset__c = -1;
+          acc.DST_Offset__pc = 0;
+          acc.Standard_Time_Offset__pc = -1;
         }
         when 'America/Anchorage' {
-          con.DST_Offset__c = -1;
-          con.Standard_Time_Offset__c = -2;
+          acc.DST_Offset__pc = -1;
+          acc.Standard_Time_Offset__pc = -2;
         }
         when 'Pacific/Honolulu' {
-          con.DST_Offset__c = -2;
-          con.Standard_Time_Offset__c = -3;
+          acc.DST_Offset__pc = -2;
+          acc.Standard_Time_Offset__pc = -3;
         }
         when else {
           System.debug(
-            'Unknown timezone identifier: ' + con.Timezone_Identifier__c
+            'Unknown timezone identifier: ' + acc.Timezone_Identifier__pc
           );
         }
       }
 
-      contactsToUpdate.add(con);
+      accountsToUpdate.add(acc);
     }
 
-    if (!contactsToUpdate.isEmpty()) {
+    if (!accountsToUpdate.isEmpty()) {
       try {
-        update contactsToUpdate;
+        update accountsToUpdate;
         System.debug(
-          'Successfully updated ' + contactsToUpdate.size() + ' contacts'
+          'Successfully updated ' + accountsToUpdate.size() + ' contacts'
         );
       } catch (Exception e) {
         System.debug('Error updating contacts: ' + e.getMessage());
@@ -64,10 +64,6 @@ public with sharing class CalculateTimeOffsets {
     return userTimeZone;
   }
 
-  // public static void calculateEventTime() {
-
-  // }
-  // This is what I am attempting to use to find out if the scheduled event date is in dst or not
   public static Integer stdTimezoneOffset(Datetime dt) {
     // Get offset for January (winter) and July (summer) of the same year
     Integer year = dt.year();
@@ -110,5 +106,6 @@ public with sharing class CalculateTimeOffsets {
         .getTime();
 
     return Integer.valueOf(offsetLong);
+    System.debug(Integer.valueOf(offsetLong));
   }
 }

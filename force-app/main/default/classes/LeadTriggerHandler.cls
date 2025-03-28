@@ -1,25 +1,31 @@
-public with sharing class LeadTriggerHandler {
-  // private List<Lead> newLeadList;
-  // private List<Lead> oldLeadList;
-  // private Map<Id, Lead> newLeadMap;
-  // private Map<Id, Lead> oldLeadMap;
+public with sharing class LeadTriggerHandler extends TriggerHandler {
+  private List<Lead> newLeadList;
+  private List<Lead> oldLeadList;
+  private Map<Id, Lead> newLeadMap;
+  private Map<Id, Lead> oldLeadMap;
 
-  // public LeadTriggerHandler() {
-  //   this.newLeadList = (List<Lead>) Trigger.new;
-  //   this.newLeadMap = (Map<Id, Lead>) Trigger.newMap;
-  //   this.oldLeadList = (List<Lead>) Trigger.old;
-  //   this.oldLeadMap = (Map<Id, Lead>) Trigger.oldMap;
-  // }
+  public LeadTriggerHandler() {
+    this.newLeadList = (List<Lead>) Trigger.new;
+    this.newLeadMap = (Map<Id, Lead>) Trigger.newMap;
+    this.oldLeadList = (List<Lead>) Trigger.old;
+    this.oldLeadMap = (Map<Id, Lead>) Trigger.oldMap;
+  }
 
-  // public override void afterInsert() {
-  //   for (Lead lead : newLeadList) {
-  //     if (lead != null && lead.isConverted == false) {
-  //       LeadConversionHelper.convertLead(lead.Id);
-  //     }
-  //   }
-  // }
+  public override void beforeInsert() {
+    for (Lead lead : newLeadList) {
+      lead.company = '';
+    }
+  }
 
-  public static void getAccsForTimezoneUpdates(List<Lead> newLeadList) {
+  public override void afterInsert() {
+    for (Lead lead : newLeadList) {
+      if (lead != null && lead.isConverted == false) {
+        LeadConversionHelper.convertLead(lead.Id);
+      }
+    }
+  }
+
+  public override void afterUpdate() {
     System.debug('Was LeadTriggerHandler::: fired?');
     Set<Id> convertedAccountIds = new Set<Id>();
     Map<Id, String> accountZipMap = new Map<Id, String>();

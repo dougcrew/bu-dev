@@ -7,6 +7,7 @@ trigger ContactTrigger on Contact(
   after delete,
   after undelete
 ) {
+  System.debug('Lead Trigger: ' + Trigger.operationType);
   ContactTriggerHandler handler = new ContactTriggerHandler();
   handler.run();
 
